@@ -1,0 +1,410 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+---
+metadata:
+  title: >-
+    Affidavit of personal service
+  short title: >-
+    Affidavit of service
+  description: |-
+    Affidavit of personal service
+  can_I_use_this_form: |
+    If you are a _____________, you can use this interview to ____________.
+  before_you_start: |
+    Before you get started, you need to...
+  maturity: production
+  estimated_completion_minutes: 60
+  estimated_completion_delta: 30
+  tags: []
+  authors:
+    - Court Forms Online
+  original_form: []
+  original_form_published_on: ""
+  allowed_courts: []
+  typical_role: "unknown"
+  al_weaver_version: "1.10.3"
+  generated_on: "2024-07-02"
+  languages:
+    - en
+  jurisdiction: NAM-US-US+MN
+  review_date: 2024-07-02
+  form_titles:
+    - Affidavit of personal service
+  form_numbers: []
+  update_notes: |
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MN"
+---
+code: |
+  github_repo_name =  'docassemble-AffidavitOfPersonalService'
+---
+code: |
+  interview_short_title = "File a Affidavit of personal service"
+---
+code: |
+  al_form_type = "other_form" 
+---
+objects:
+  - users: ALPeopleList.using(complete_attribute="complete",there_are_any=True)
+  - the_courts: ALCourtLoader.using(filename="Courts.xlsx")
+  - other_parties: ALPeopleList.using(there_are_any=True)
+---
+generic object: ALIndividual
+template: x.person_type_label
+content: |
+  Is this a person or a company?
+---
+generic object: ALIndividual
+template: x.business_choice_label
+content: |
+  Company
+---
+generic object: ALIndividual
+template: x.business_name_label
+content: |
+  Name of company
+---
+sections:
+  - review_affidavit_of_personal_service: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_affidavit_of_personal_service
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = []
+  # nav.set_section("review_affidavit_of_personal_service")
+  case_type
+  docket_number
+  set_progress(14)
+  user_ask_role
+  users.gather()
+  other_parties.gather()
+  set_progress(28)
+  filing_court
+  display_court
+  set_progress(42)
+  set_progress(56)
+  interview_order_affidavit_of_personal_service = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  affidavit_of_personal_service_intro
+  interview_order_affidavit_of_personal_service
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  affidavit_of_personal_service_download
+---
+id: Affidavit_of_personal_service
+continue button field: affidavit_of_personal_service_intro
+question: |
+  Affidavit of personal service
+subquestion: |
+  When you start a court case, you must give the other party notice. If your estimated cost of repairs is <b>less than $20,000</b>, the court will do this for you. If you your estimated cost of repairs is <b>more than $20,000</b>, you must complete and file this Affidavit of Service form.
+  
+  Fill out as much information as you have at this time. You will be able to download and print a copy to give to your process server. The process server can be anyone over 18 years old who is not involved in this case. <b>The <b>process server</b> must complete the remaining parts of the form and sign and date it. YOU CAN'T SERVE YOUR LANDLORD!</b> 
+  
+  Service must be completed between 5 and 10 days prior to your hearing date. YOU must file this Affidavit of Service form with the court at least 3 days before the hearing date.
+  
+  Most people take about 5 minutes to complete this interview.
+  
+  <i>If you want to share this form with someone else, click the 'Share' button in the footer at the bottom of the page. You can share the form at any point.</i>
+---
+id: case type
+question: Select the Case Type below. 
+subquestion: |
+  See the <a href="https://www.mncourts.gov/mncourtsgov/media/scao_library/documents/eFile%20Support/Handout-Civil-Case-Type-Index.pdf" title="https://www.mncourts.gov/mncourtsgov/media/scao_library/documents/eFile%20Support/Handout-Civil-Case-Type-Index.pdf">Civil Case Type Index</a> for more information about Civil case types. 
+  
+  See the <a href="https://www.mncourts.gov/mncourtsgov/media/scao_library/documents/eFile%20Support/Handout-Criminal-and-Delinquency-Filing-Codes-Index_1.pdf" title="https://www.mncourts.gov/mncourtsgov/media/scao_library/documents/eFile%20Support/Handout-Criminal-and-Delinquency-Filing-Codes-Index_1.pdf">Criminal and Juvenile Delinquency Case Type Index</a> for more information about Criminal or Juvenile Delinquency case types.
+fields:
+  - Case Type: case_type
+    choices: 
+      - Civil
+      - Civil Commitment
+      - Criminal
+      - Family
+      - Juvenile Delinquency
+      - Probate
+    default: Civil
+---
+code: |
+  users[i].name.first
+  users[i].name.last
+  users[i].name.middle
+  users[i].name.suffix
+  users[i].complete = True
+---
+sets:
+  - users[i].name.first
+  - users[i].name.last
+  - users[i].name.middle
+  - users[i].name.suffix
+id: Petitioners (i.e. users)
+question: |
+  List the Petitioner(s) involved in the case. 
+subquestion: |  
+  The **Tenant** is the Petitioner.
+fields:
+  - code: |
+      users[i].name_fields()
+---
+sets:
+  - other_parties[i].name.first
+  - other_parties[i].name.last
+  - other_parties[i].name.middle
+  - other_parties[i].name.suffix
+id: names of opposing parties
+question: |
+  % if user_started_case:
+  Name of ${ ordinal(i) } **defendant** or respondent in this
+  matter
+  % else:
+  Name of ${ ordinal(i) } **plaintiff** or petitioner in this matter
+  % endif
+subquestion: |  
+  The **Defendant** is your landlord, management company, and/or business.
+fields:
+  - code: |
+      other_parties[i].name_fields(person_or_business='unsure')
+---
+code: |
+  if the_courts.county_has_one_court(the_county):
+    my_court = the_courts.county_court("my_court", the_county)
+  else:
+    court_index
+    my_court = the_courts.as_court("my_court", court_index)
+---
+id: Filing Court
+continue button field: filing_court
+question: |
+  What court do you want to file in?
+fields:
+  - Judicial District: trial_court_district
+    choices: 
+      - 1st
+      - 2nd
+      - 3rd
+      - 4th
+      - 5th
+      - 6th
+      - 7th
+      - 8th
+      - 9th 
+      - 10th
+    help: |
+       There are 10 districts in Minnesota.
+       **1st**: McLeod, Sibley, Carver, Scott, Dakota, Le Sueur, Goodhue
+       **2nd**: Ramsey    
+       **3rd**: Rice, Waseca, Steele, Dodge, Olmsted, Wabasha, Winona, Freeborn, Mower, Fillmore, Houston
+       **4th**: Hennepin
+       **5th**: Lincoln, Lyon, Redwood, Brown, Nicollet, Pipestone, Murray, Cottonwood, Watonwan, Blue Earth, Rock, Nobles, Jackson, Martin, Faribault
+       **6th**: St. Louis, Lake, Cook, Carlton
+       **7th**: Clay, Becker, Otter Tail, Wadena, Douglas, Todd, Morrison, Mille Lacs, Stearns, Benton
+       **8th**: Wilkin, Grant, Traverse, Big Stone, Stevens, Pope, Swift, Lac qui Parle, Kandiyohi, Chippewa, Meeker, Yellow Medicine, Renville
+       **9th**: Kittson, Roseau, Lake of the Woods, Marshall, Beltrami, Koochiching, Pennington, Red Lake, Polk, Clearwater, Norman, Mahnomen, Hubbard, Cass, Itasca, Crow Wing, Aitkin
+       **10th**: Pine, Kanabec, Sherburne, Isanti, Chisago, Anoka, Wright, Washington
+    required: False
+  - Trial court state: trial_court_state
+    code: |
+      states_list()
+    default: Minnesota
+    required: False
+  - Court County: the_county
+    code: sorted(the_courts.county_list())
+    required: False
+section: filing_court
+---
+question: |
+  There is more than one court in your county. Pick the court below.
+fields:
+  - "no label": court_index
+    code: the_courts.matching_courts_in_county(the_county)
+---
+continue button field: display_court
+question: |
+  You selected "${ my_court }"
+subquestion: |
+  ${ my_court.address.block() }
+---
+id: preview affidavit_of_personal_service
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_affidavit_of_personal_service'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: affidavit_of_personal_service_preview_question    
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  [user.address.address for user in users.complete_elements()]
+  addresses_to_search = [user.address for user in users.complete_elements()]
+---
+id: affidavit of personal service review screen
+event: review_affidavit_of_personal_service
+question: |
+  Review your answers
+review:
+  - Edit: trial_court_district
+    button: |
+      **Trial court district**:
+      ${ trial_court_district }
+  - Edit: the_county
+    button: |
+      **County**:
+      ${ the_county }
+  - Edit: trial_court_state
+    button: |
+      **Trial court state**:
+      ${ trial_court_state }
+  - Edit: docket_number
+    button: |
+      **Docket number**:
+      ${ docket_number }
+  - Edit: case_type
+    button: |
+      **Case Type**:
+      ${ case_type }
+#  - Edit: trial_court
+#    button: |
+#      **Trial court**
+  
+#      % if defined("trial_court.address.county"):
+#      * address: ${ trial_court.address.block() }
+#      % endif
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: other_parties.revisit
+    button: |
+      **Other parties**
+
+      % for item in other_parties:
+        * ${ item }
+      % endfor
+---
+continue button field: petitioners.revisit
+question: |
+  Edit petitioners
+subquestion: |
+  ${ petitioners.table }
+
+  ${ petitioners.add_action() }
+---
+table: petitioners.table
+rows: petitioners
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+continue button field: other_parties.revisit
+question: |
+  Edit other_parties
+subquestion: |
+  ${ other_parties.table }
+
+  ${ other_parties.add_action() }
+---
+table: other_parties.table
+rows: other_parties
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+edit:
+  - name.first
+  - address.address
+confirm: True
+---
+id: download affidavit_of_personal_service
+event: affidavit_of_personal_service_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_affidavit_of_personal_service'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - affidavit_of_personal_service_Post_interview_instructions: ALDocument.using(title="Instructions", filename="affidavit_of_personal_service_next_steps.docx", enabled=True, has_addendum=False)
+  - affidavit_of_personal_service_attachment: ALDocument.using(title="Affidavit of personal service", filename="affidavit_of_personal_service", enabled=True, has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[affidavit_of_personal_service_Post_interview_instructions, affidavit_of_personal_service_attachment], filename="affidavit_of_personal_service", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[affidavit_of_personal_service_attachment],  filename="affidavit_of_personal_service", title="All forms to deliver to court", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+attachment:
+  name: Post-interview-Instructions
+  filename: affidavit_of_personal_service_next_steps
+  docx template file: affidavit_of_personal_service_next_steps.docx
+  variable name: affidavit_of_personal_service_Post_interview_instructions[i]
+  skip undefined: True
+  tagged pdf: True
+---
+attachment:
+  name: affidavit of personal service
+  filename: affidavit_of_personal_service
+  variable name: affidavit_of_personal_service_attachment[i]
+  skip undefined: True
+  pdf template file: Affidavit_of_Personal_Service.pdf
+  editable: False
+  fields:
+      - "trial_court_district": ${ trial_court_district }
+      - "docket_number": ${ docket_number }
+      - "case_type": ${ case_type }
+      - "the_county": ${ the_county }  
+      - "multi_user_comma": ${ comma_and_list(users[0], users[1]) } 
+      - "multi_other_parties_comma": ${ comma_and_list(other_parties[0], other_parties[1]) }

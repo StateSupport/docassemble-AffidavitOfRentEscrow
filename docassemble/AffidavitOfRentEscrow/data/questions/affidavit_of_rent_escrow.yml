@@ -1,0 +1,772 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+---
+metadata:
+  title: >-
+    Affidavit of Rent Escrow
+  short title: >-
+    Affidavit of rent escrow
+  description: |-
+    Affidavit of Rent Escrow
+  can_I_use_this_form: |
+    If you are a tenant, you can use this interview to file a Rent Escrow action.
+  before_you_start: |
+    Before you get started, you need to...
+  maturity: production
+  estimated_completion_minutes: 60
+  estimated_completion_delta: 30
+  LIST_topics: 
+    - "HO-00-00-00-00"
+  tags:
+    - "HO-00-00-00-00"
+  authors:
+    - Court Forms Online
+  original_form: []
+  original_form_published_on: ""
+  allowed_courts: []
+  typical_role: "Plaintiff"
+  al_weaver_version: "1.10.3"
+  generated_on: "2024-07-15"
+  languages:
+    - en
+  jurisdiction: NAM-US-US+MN
+  review_date: 2024-07-15
+  form_titles:
+    - Affidavit of Rent Escrow
+  form_numbers: []
+  update_notes: |
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MN"
+---
+code: |
+  github_repo_name =  'docassemble-AffidavitOfRentEscrow'
+---
+code: |
+  interview_short_title = "File a Affidavit of rent escrow"
+---
+code: |
+  al_form_type = "starts_case" 
+---
+objects:
+  - the_courts: ALCourtLoader.using(filename="Courts.xlsx")
+  - users: ALPeopleList.using(complete_attribute="complete",there_are_any=True)
+  - other_parties: ALPeopleList.using(complete_attribute="complete",there_are_any=True) 
+---
+#Do I need this here?
+generic object: ALDocumentBundle
+template: x.get_email_copy
+content: |
+  Get a copy of the documents in email
+---
+#Do I need this here?
+generic object: ALDocumentBundle
+template: x.zip_label
+content: |
+  Download all
+---
+generic object: ALIndividual
+template: x.person_type_label
+content: |
+  Is this a person or a company?
+---
+generic object: ALIndividual
+template: x.business_choice_label
+content: |
+  Company
+---
+generic object: ALIndividual
+template: x.business_name_label
+content: |
+  Name of company
+---
+sections:
+  - affidavit_of_rent_escrow_intro: Instructions
+  - filing_court: Court Information
+  - user_name: Tenant Names
+  - user_address: Tenant Addresses
+  - repair_issues: Repair Issues
+  - notice_of_repair_issues: Notice to Landlord/Manager
+  - rent_info: Rent Information
+  - relief_sought: Relief Requested
+  - review_affidavit_of_rent_escrow: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_affidavit_of_rent_escrow
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = []
+  nav.set_section("review_affidavit_of_rent_escrow")
+  # Below sets the user_role and user_ask_role by asking a question.
+  # You can set user_ask_role directly instead to either 'plaintiff' or 'defendant'
+  #user_ask_role
+  trial_court_district
+  docket_number
+  users.gather()
+  set_parts(subtitle=str(users))
+  set_progress(14)
+  other_parties.gather()
+  repairs_issues
+  set_progress(28)
+  inspector_order_yes
+  rent_amount
+  relief_order_repairs
+  set_progress(42)
+  #affidavit_of_rent_escrow_preview_question
+  #Signature
+  interview_order_affidavit_of_rent_escrow = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  affidavit_of_rent_escrow_intro
+  interview_order_affidavit_of_rent_escrow
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  affidavit_of_rent_escrow_preview_question
+  basic_questions_signature_flow    
+  Signature
+  affidavit_of_rent_escrow_download
+---
+id: Affidavit_of_Rent_Escrow
+continue button field: affidavit_of_rent_escrow_intro
+question: |
+  <b>Instructions - Request for Rent Escrow</b>
+subquestion: |
+  If you are a tenant, you can use this interview to file a Rent Escrow action.
+  
+  <b>Forms you may need to request a Rent Escrow:</b>
+    
+    - <i>Affidavit of Rent Escrow (HOU302)</i>;
+    - <i>Affidavit of Inability to Pay Filing Fee - Housing (HOU1002)</i> (if you cannot afford the filing fee); and
+    - <i>Affidavit of Service</i> (if repairs are more than $20,000).
+  
+   The “Tenant’s Rent Escrow Packet” of <a href="www.mncourts.gov/forms" title="www.mncourts.gov/forms">Forms</a> are available online at under the “Housing/Landlord-Tenant” category.
+   
+  ##<b>Resources and General Information about Rent Escrow</b>
+  <b>Important Information:</b>
+    
+    - A rent escrow action is a legal way for a residential tenant to bring a claim that requires the landlord to make needed repairs or to comply with the terms of the lease. 
+    
+    - The court can only hear cases involving residential property located in its own county. 
+    
+    - A tenant cannot be evicted on the basis of demanding repairs, calling a Housing Inspector or starting a rent escrow action. The tenant can be evicted for not paying the rent due to the landlord up to the time of filing the rent escrow action or not depositing the full amount with the court at the time the action is filed. The landlord may allege that there are other reasons the tenant should be evicted. 
+    
+    - The tenant must reside in the problem property. The tenant cannot file a rent escrow action after they have moved. 
+    
+    - The tenant can ask the court to order the landlord to make repairs, reduce the rent until repairs are complete, refund a portion of past rent when repairs were not made and other relief. 
+
+  One of the following must have occurred before the tenant may file:
+    
+    - The tenant must provide the landlord with written notice listing the needed repairs or describing what part of the lease the landlord has not completed. The notice must have been personally delivered to the landlord or mailed to the place where rent is usually paid. If it has been at least 14 days since the tenant provided the landlord with a written notice, then the tenant may file.
+    
+    - A local housing inspector completed a code violation report and the deadline the inspector gave the landlord to make repairs has passed without the repairs being completed. The tenant must ask the inspector for a copy of the report. 
+    
+    - A local housing inspector completed a code violation report and the tenant believes the inspector gave the landlord too much time to complete the repairs. The tenant must ask the inspector for a copy of the report. 
+
+
+  ###<b>Requirements to File a Rent Escrow:</b>
+    
+    - Complete an <i>Affidavit of Rent Escrow</i> (available at the Court Administrator/Housing Court office or online at <a href="www.mncourts.gov/forms" title="www.mncourts.gov/forms">Forms</a> under the “Housing/Landlord-Tenant” category).
+    
+    - Attach a copy of the Code Inspection Report by the inspector OR the tenant’s letter to the landlord requesting repairs (Case can be filed if the tenant does not have a copy). 
+    
+    - Pay the filing fee or complete the <i>Affidavit of Inability to Pay Filing Fee - Housing (HOU1002)</i>
+    
+    - Deposit any rent that is owed with the court. Personal checks are not accepted. Cash or cashier’s check is acceptable. Check with the Court Administrator/Housing Court for acceptable forms of payment.
+    
+  ####<b>Step 1 - Fill out the <i>Affidavit of Rent Escrow (HOU302)</i></b>
+  
+  <b>Caption of the Affidavit</b>
+    
+    - The tenant(s) is the plaintiff. 
+    
+    - The landlord is the defendant. The landlord may be a corporation or an individual. Be sure to list the landlord, not their agent. 
+
+  <b>Body of the Affidavit</b>
+
+    1. Fill in your complete address including your apartment number, city, state, ZIP, county and phone number including area code. 
+    
+    2. Fill in the landlord’s name, complete address, city, state, ZIP and phone number including area code. 
+    
+    3. If the property manager is different from the landlord, fill in their name, address, city, state, ZIP and phone number including area code. 
+    
+    4. List all problems or violations with your housing that have NOT been repair. Attach additional pages if needed. 
+    
+    5. Give an estimate of how much it would cost to repair the problems or violations listed in (4) above. If you don’t know, contact someone to give you a professional estimate.
+    
+    6. If the inspector issued a code violation report, complete “a”. If you mailed or personally delivered a letter requesting repairs, complete “b”. 
+    
+    7. Fill in the amount of your monthly rent and when it is due. If rent is paid in full to date, check “a”. If rent is due, check “b” and be prepared to deposit that amount with the court. Check with Court Administrator/Housing Court for acceptable forms of payment.
+    
+    8. If there is something you would like the court to do, indicate by checking the appropriate boxes. You may leave this question blank. 
+    
+    <b>Acknowledgement and Signature Block</b>
+  
+  Read the “Acknowledgement” before you date and sign the form. When you sign the <i>Affidavit for Rent Escrow</i>, you are signing under penalty of perjury. This means you are saying that everything in the form is true and correct; if you know something in the form is not true when you sign it, you could be found guilty of the crime of perjury (see <a href="www.revisor.mn.gov/statutes/?id=609.48" title="www.revisor.mn.gov/statutes/?id=609.48">Minn. Stat. § 609.48</a>). 
+
+    - Date and sign the form.
+    - Include the county and state you were in when you signed the form.
+    - Include your name and contact information in the blanks under the signature line. 
+
+  ####<b>Step 2 - File with the Court and Get a Court Date</b>
+
+    - File the required forms with the court. Addresses for courthouses are online at <a href="https://mncourts.gov/Find-Courts.aspx" title="https://mncourts.gov/Find-Courts.aspx">Find Courts</a>. Use the drop-down menu or map to find your county. A filing fee will be due. If you cannot afford the filing fee, fill out the <i>Affidavit of Inability to Pay Filing Fee - Housing (HOU1002)</i> to file with your <i>Affidavit</i>.
+    
+    - Once your <i>Affidavit of Rent Escrow</i> has been filed with the court, the clerk will prepare a <i>Notice of Hearing for Rent Escrow</i> and attach a copy of the <i>Affidavit of Rent Escrow</i> and either the code violation report or your letter to the landlord requesting repairs. 
+    
+    - A court date will be set within 10 to 14 days after the rent is deposited with the court unless there is a pending eviction action. If so, both the eviction and the rent escrow will be set for the same date (Minn. Stat. § 504B.385, subd. 8)
+  
+  ####<b>Step 3 - Notify (serve) the Landlord of the Court Date (Minn. Stat. § 504B.385, subd. 5)</b>
+
+  <b>Cost of Repairs is $20,000 or Less:</b>
+    
+    - The court clerk will serve the landlord at the address provided by the tenant. Service will be by first class mail. 
+
+  <b>Cost of Repairs is More than $20,000:</b>
+    
+    - The tenant is responsible for arranging for personal service on the landlord(s). Service may be done by any one 18 years of age or older who is not a party to the case. The tenant can not serve the landlord. Service must be made at least 5 days but not more than 10 days before the date of the hearing. The person doing the service must complete an Affidavit of Personal Service. The tenant must file this affidavit with the court at least 3 days before the court date. 
+  
+  ####<b>What to Expect Next…</b>
+  
+  <b>At the Hearing</b>
+
+  Once the case is decided, the judicial officer will issue a Decision and Order. The Decision and Order will address who is to receive the rent that is deposited with the court. The court may order a portion to the landlord and a portion to the tenant or may order all the monies to one party. The court may schedule a future date to ensure the landlord has complied with its court. 
+
+  <b>If the repairs are made before the court date</b>
+
+  The tenant notifies the court in writing that the needed repairs have been made, the clerk will release the rent to the landlord. The hearing will be cancelled. If the tenant and landlord enter into a written agreement signed by all parties distributing the rent between them, the clerk must release the rent in accordance with the written agreement. 
+
+  <b>What can happen if rent due is not deposited with the Court (Minn. Stat. § 504B.385, subd. 2)</b>
+
+  The landlord may file a Counterclaim for Possession of the Premises or a separate eviction action if the tenant did not or does not deposit all rent due.
+   
+  Most people take about 20 minutes to complete this interview.
+section: affidavit_of_rent_escrow_intro
+---
+code: |
+  if the_courts.county_has_one_court(the_county):
+    my_court = the_courts.county_court("my_court", the_county)
+  else:
+    court_index
+    my_court = the_courts.as_court("my_court", court_index)
+---
+id: district and county
+question: |
+  What court do you want to file in?
+fields:
+  - Judicial District: trial_court_district
+    choices: 
+      - 1st
+      - 2nd
+      - 3rd
+      - 4th
+      - 5th
+      - 6th
+      - 7th
+      - 8th
+      - 9th 
+      - 10th
+    help: |
+       There are 10 judicial districts in Minnesota.
+       **1st**: McLeod, Sibley, Carver, Scott, Dakota, Le Sueur, Goodhue
+       **2nd**: Ramsey    
+       **3rd**: Rice, Waseca, Steele, Dodge, Olmsted, Wabasha, Winona, Freeborn, Mower, Fillmore, Houston
+       **4th**: Hennepin
+       **5th**: Lincoln, Lyon, Redwood, Brown, Nicollet, Pipestone, Murray, Cottonwood, Watonwan, Blue Earth, Rock, Nobles, Jackson, Martin, Faribault
+       **6th**: St. Louis, Lake, Cook, Carlton
+       **7th**: Clay, Becker, Otter Tail, Wadena, Douglas, Todd, Morrison, Mille Lacs, Stearns, Benton
+       **8th**: Wilkin, Grant, Traverse, Big Stone, Stevens, Pope, Swift, Lac qui Parle, Kandiyohi, Chippewa, Meeker, Yellow Medicine, Renville
+       **9th**: Kittson, Roseau, Lake of the Woods, Marshall, Beltrami, Koochiching, Pennington, Red Lake, Polk, Clearwater, Norman, Mahnomen, Hubbard, Cass, Itasca, Crow Wing, Aitkin
+       **10th**: Pine, Kanabec, Sherburne, Isanti, Chisago, Anoka, Wright, Washington
+    required: False
+  - Trial court state: trial_court_state
+    code: |
+      states_list()
+    default: Minnesota
+    required: False
+  - Court County: the_county
+    code: sorted(the_courts.county_list())
+    required: False
+section: filing_court
+---
+question: |
+  There is more than one court in your county. Pick the court below.
+fields:
+  - "no label": court_index
+    code: the_courts.matching_courts_in_county(the_county)
+---
+continue button field: display_court
+question: |
+  You selected "${ my_court }"
+subquestion: |
+  ${ my_court.address.block() }
+---
+code: |
+  users[i].name.first
+  users[i].name.last
+  users[i].name.middle
+  users[i].name.suffix
+  users[i].address.address
+  users[i].address.county
+  users[i].phone_number
+  users[i].complete = True
+---
+sets:
+  - users[i].name.first
+  - users[i].name.last
+  - users[i].name.middle
+  - users[i].name.suffix    
+id: other users names
+question: |
+  % if i == 0 and al_person_answering == "user":
+  What is your name?
+  % else:
+  % if al_form_type in ['starts_case','existing_case','appeal']:
+  Who is the ${ ordinal(i) } person on your side of the case?
+  % else:
+  What is the name of the ${ ordinal_number(i) } person who is adding their name to
+  this form with you?
+  % endif
+  % endif
+fields:
+  - code: |
+      users[i].name_fields()
+section: user_name
+---
+id: user i's address
+question: |
+  % if i == 0 and al_person_answering == "user":
+  What is your address?
+  % else:
+  What is ${ users[i] }'s address?
+  % endif
+fields:
+  - label: |
+      % if i > 0 and al_person_answering == "user":
+      Same as your address
+      % else:
+      Same as ${ users[0] }'s address
+      % endif
+    field: users[i].address
+    datatype: object_radio
+    choices:
+      - users[0].address if defined("users[0].address.address") else None
+    object labeler: |
+      lambda y: y.on_one_line()      
+    none of the above: |
+      Somewhere else
+    disable others: True
+    show if:
+      code: |
+        i > 0 and defined("users[0].address.address")
+  - ${ users[i].address.address_label}: users[i].address.address
+    address autocomplete: True
+  - ${ users[i].address.unit_label}: users[i].address.unit
+    required: False
+  - ${ users[i].address.city_label}: users[i].address.city
+  - ${ users[i].address.state_label}: users[i].address.state
+    code: |
+      states_list(country_code=AL_DEFAULT_COUNTRY)
+    default: ${ AL_DEFAULT_STATE }
+  - ${ users[i].address.zip_label}: users[i].address.zip
+    required: False
+  - ${ users[i].address.county_label}: users[i].address.county
+    code: sorted(the_courts.county_list())
+section: user_address
+---
+code: |
+  other_parties[i].name_fields(person_or_business='unsure')
+  other_parties[i].address.address
+  other_parties[i].phone_number
+  other_parties[i].complete = True
+---
+id: persons contact information
+generic object: ALIndividual
+question: |
+  What is ${x}'s phone number?
+fields:
+  - Phone: x.phone_number
+    required: False
+---
+id: Repairs issues
+question: |
+  List of all problems or violations you have with your rental housing:
+fields:
+  - "Repairs issues": repairs_issues
+    maxlength: 250
+    input type: area
+  - "Estimated cost of repairs": cost_of_repairs
+    datatype: currency
+    minlength: 0
+section: repair_issues
+---
+id: notice
+question: |
+  The landlord or manager received the following written notice about the problems or violations with my apartment or rental housing:
+fields:
+  - "The City Inspector issued an order, ordering the landlord or manager to fix the problems or violations ": inspector_order_yes
+    datatype: yesno
+  - "Date inspector issued order": inspector_order_date
+    datatype: date
+    show if: inspector_order_yes
+  - "Date order requires repairs to be fixed by": inspector_order_fix_by_date
+    datatype: date
+    show if: inspector_order_yes
+  - "And (select one of the following)": inspector_order
+    choices:
+      - The landlord and manager did not complete the repairs on time: repairs_completion_untimely
+      - The City Inspector gave the landlord or manager too much time to complete the repairs, because:: repairs_too_much_time_for_completion
+    datatype: checkboxes
+    none of the above: False
+    show if: inspector_order_yes
+  - "no label": too_much_time_for_completion_explanation
+    input type: area
+    show if: 
+      variable: inspector_order
+      is: True
+    maxlength: 100
+  - "I mailed or hand delivered to the landlord and/or manager a written list of repairs needed or other problems with my rental housing. It has been at least 14 days since I provided the landlord and/or manager with the written notice and the landlord and/or manager have not completed the repairs or fixed the problems.": repairs_request_letter_yes
+    datatype: yesno
+  - "Date written list of repairs was delivered": repairs_request_letter_date
+    datatype: date
+    show if: repairs_request_letter_yes
+  - "The written list of repairs was delivered to:": repairs_requested_delivered_to
+    choices:
+      - The property manager: manager
+      - The property landlord: landlord
+    datatype: checkboxes
+    none of the above: False
+    show if: repairs_request_letter_yes
+section: notice_of_repair_issues
+---
+id: rent
+question: |
+  Rent information
+fields:
+  - "Monthly rent amount": rent_amount
+    datatype: currency
+    min: 0
+  - "My rent is due on this date each month": day_rent_due
+    datatype: date
+  # How do I add a line above these two options, like a question or header? - As of this date: (check one): 
+  - "My rent is paid in full and no rent is due until": rent_paid
+    datatype: yesno
+  - "I owe the following amount of rent and I am depositing this amount with the court.": rent_due
+    datatype: yesno
+  - "no label": next_rent_due_date
+    show if: rent_paid
+    datatype: date
+  - "no label": rent_owed
+    show if: rent_due
+    datatype: currency
+section: rent_info
+---
+id: relief
+question: |
+  I ask the court to order one or more of the following (check all that apply):
+fields:
+  - "Directing the landlord and/or manager to complete the repairs and/or fix the problems with my housing.": relief_order_repairs
+    datatype: yesno
+  - "Allowing me to complete the repairs and/or fix the problems with my housing and deduct the costs from my rent.": relief_self_complete_repairs
+    datatype: yesno
+  - "Directing that an administrator take over operation of the property to complete the repairs and/or fix the problems with my housing.": relief_administrator
+    datatype: yesno
+  - "Directing the landlord and/or manager to pay me a rent refund for the month(s) when my housing was not fixed.": relief_rent_refund
+    datatype: yesno
+  - "Directing the landlord and/or manager to give me a rent reduction each month until the repairs are completed and problems fixed.": relief_rent_reduction
+    datatype: yesno
+  - "Directing the landlord and/or manager to pay a fine if this Order is violated.": relief_fine
+    datatype: yesno
+  - "Directing the landlord and/or manager to pay reasonable attorney fees.": relief_attorney_fees
+    datatype: yesno
+  - "Other:": relief_other
+    datatype: yesno
+  - "Explain": relief_other_explanation
+    input type: area
+    maxlength: 150
+    show if: relief_other
+section: relief_sought
+---
+id: preview affidavit_of_rent_escrow
+question: |
+  Preview your form before you sign it
+  ${ users[0].phone_number } phone number:
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_affidavit_of_rent_escrow'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: affidavit_of_rent_escrow_preview_question    
+---
+code: |
+  signature_fields = ['Signature']
+---
+question: |
+  Signature, sign below
+signature: Signature
+---
+#  - "Date signed": date_signed
+#    maxlength: 27
+#---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  [user.address.address for user in users.complete_elements()]
+  addresses_to_search = [user.address for user in users.complete_elements()]
+---
+id: affidavit of rent escrow review screen
+event: review_affidavit_of_rent_escrow
+question: |
+  Review your answers
+review:
+  - Edit: trial_court_district
+    button: |
+      **Judicial District**:
+      ${ trial_court_district }
+  - Edit: the_county
+    button: |
+      **County**:
+      ${ the_county }
+  - Edit: docket_number
+    button: |
+      **Docket number**:
+      ${ docket_number }
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: other_parties.revisit
+    button: |
+      **Other parties**
+
+      % for item in other_parties:
+        * ${ item }
+      % endfor
+  - Edit: repairs_issues
+    button: |
+      **Repairs issues**:
+      ${ repairs_issues }
+  - Edit: inspector_order_yes
+    button: |
+      **Notice to Landlord/Manager**
+  - Edit: rent_amount
+    button: |
+      **Rent Information**
+  - Edit: relief_order_repairs
+    button: |
+      **Relief Requested**
+  - Edit: Signature
+    button: |
+      **Signature**:
+      ${ Signature }
+  - Edit: date_signed
+    button: |
+      **Date signed**:
+      ${ date_signed }
+---
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+  - Phone number: |
+      row_item.phone_number if defined("row_item.phone_number") else ""
+  - Email: |
+      row_item.email if defined("row_item.email") else ""
+edit:
+  - name.first
+  - address.address
+  - phone_number
+  - email
+confirm: True
+
+---
+continue button field: other_parties.revisit
+question: |
+  Edit other_parties
+subquestion: |
+  ${ other_parties.table }
+
+  ${ other_parties.add_action() }
+---
+table: other_parties.table
+rows: other_parties
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+id: download affidavit_of_rent_escrow
+event: affidavit_of_rent_escrow_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_affidavit_of_rent_escrow'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - affidavit_of_rent_escrow_Post_interview_instructions: ALDocument.using(title="Instructions", filename="affidavit_of_rent_escrow_next_steps.docx", enabled=True, has_addendum=False)
+  - affidavit_of_rent_escrow_attachment: ALDocument.using(title="Affidavit of Rent Escrow", filename="affidavit_of_rent_escrow", enabled=True, has_addendum=False, )
+#  - affidavit_of_personal_service_attachment: ALDocument.using(title="Affidavit of personal service", filename="affidavit_of_personal_service", enabled=True, has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[affidavit_of_rent_escrow_Post_interview_instructions, affidavit_of_rent_escrow_attachment], filename="affidavit_of_rent_escrow", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[affidavit_of_rent_escrow_attachment],  filename="affidavit_of_rent_escrow", title="All forms to deliver to court", enabled=True)
+#  - al_court_bundle: ALDocumentBundle.using(elements=[afaffidavit_of_personal_service], filename="affidavit_of_personal_service", title="All forms to deliver to court", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+attachment:
+  name: Post-interview-Instructions
+  filename: affidavit_of_rent_escrow_next_steps
+  docx template file: affidavit_of_rent_escrow_next_steps.docx
+  variable name: affidavit_of_rent_escrow_Post_interview_instructions[i]
+  skip undefined: True
+  tagged pdf: True
+---
+attachment:
+  name: affidavit of rent escrow
+  filename: affidavit_of_rent_escrow
+  variable name: affidavit_of_rent_escrow_attachment[i]
+  skip undefined: True
+  pdf template file: Affidavit_of_Rent_Escrow.pdf
+  fields:
+      - "trial_court_district": |
+          % if the_county in ["Carver", "Dakota", "Goodhue", "Le Sueur", "McLeod", "Scott", "Sibley", "Dakota"]:
+            First Judicial District
+          % elif the_county in ["Ramsey"]:
+            Second Judicial District
+          % elif the_county in ["Dodge", "Fillmore", "Freeborn", "Houston", "Mower", "Olmsted", "Rice", "Steele", "Wabasha", "Waseca", "Winona"]:
+            Third Judicial District
+          % elif the_county in ["Hennepin"]:
+            Fourth Judicial District
+          % elif the_county in ["Brown", "Cottonwood", "Faribault", "Jackson", "Lincoln", "Lyon", "Martin", "Murray", "Nicollet", "Nobles", "Pipestone", "Redwood", "Rock", "Watonwan"]:
+            Fifth Judicial District
+          % elif the_county in ["Carlton", "Cook", "Lake", "St. Louis"]:
+            Sixth Judicial District
+          % elif the_county in ["Becker", "Benton", "Clay", "Douglas", "Mille Lacs", "Morrison", "Otter Tail", "Stearns", "Todd", "Wadena"]:
+            Seventh Judicial District
+          % elif the_county in ["Big Stone", "Chippewa", "Grant", "Kandiyohi", "Lac qui Parle", "Meeker", "Pope", "Renville", "Stevens", "Swift", "Traverse", "Wilkin", "Yellow Medicine"]:
+            Eighth Judicial District
+          % elif the_county in ["Aitkin", "Beltrami", "Cass", "Clearwater", "Crow Wing", "Hubbard", "Itasca", "Kittson", "Koochiching", "Lake of the Woods", "Mahnomen", "Marshall", "Norman", "Pennington", "Polk", "Red Lake", "Roseau"]:
+            Ninth Judicial District
+          % elif the_county in ["Pine", "Kanabec", "Sherburne", "Isanti", "Chisago", "Anoka", "Wright", "Washington"]:
+            Tenth Judicial District
+          % endif
+      - "the_county": ${ the_county } 
+      - "docket_number": ${ docket_number } 
+      - "multi_user_comma": ${ comma_and_list(users[0], users[1], users[2]) } 
+      - "users1_address_address_1": ${ users[0].address.address }
+      - "users1_address_unit_1": ${ users[0].address.unit } 
+      - "users1_address_line_two_1": ${ users[0].address.line_two() } 
+      - "users1_address_county_1": ${ users[0].address.county } 
+      - "users1_phone_number_1": ${ users[0].phone_numbers() } 
+      - "users1_email_1": ${ users[0].email } 
+      #- "users1_name_2": ${ users[1].name.full() } #all names are included
+      - "users1_address_address_2": ${ users[1].address.address } #need to use an addendum for these additional
+      - "users1_address_unit_2": ${ users[1].address.unit } #need to use an addendum for these additional
+      - "users1_address_line_two_2": ${ users[1].address.line_two() } #need to use an addendum for these additional
+      - "users1_address_county_2": ${ users[1].address.county } #need to use an addendum for these additional
+      - "users1_phone_number_2": ${ users[1].phone_number } #need to use an addendum for these additional
+      - "users1_email_2": ${ users[1].email } #need to use an addendum for these additional
+      #- "users1_name_3": ${ users[2].name.full() } #all names are included
+      - "users1_address_address_3": ${ users[2].address.address } #need to use an addendum for these additional
+      - "users1_address_unit_3": ${ users[2].address.unit } #need to use an addendum for these additional
+      - "users1_address_line_two_3": ${ users[2].address.line_two() } #need to use an addendum for these additional
+      - "users1_address_county_3": ${ users[2].address.county } #need to use an addendum for these additional
+      - "users1_phone_number_3": ${ users[2].phone_number } #need to use an addendum for these additional
+      - "users1_email_3": ${ users[2].email } #need to use an addendum for these additional
+      - "multi_other_parties_comma": ${ comma_and_list(other_parties[0], other_parties[1]) }
+      - "other_parties1_name_1": ${ other_parties[0] }
+      - "other_parties_1_address_on_one_line_1": ${ other_parties[0].address.line_one() }
+      - "other_parties1_phone_number_1": ${ other_parties[0].phone_number }
+      - "other_parties1_name_2": ${ other_parties[1] }
+      - "other_parties_1_address_on_one_line_2": ${ other_parties[1].address.line_one() }
+      - "other_parties1_phone_number_2": ${ other_parties[1].phone_number }
+      - "repairs_issues": ${ repairs_issues } #working but the wrapping isn't lining up well w/the lines on the PDF
+      - "cost_of_repairs": ${ cost_of_repairs }
+      - "inspector_order_yes": ${ inspector_order_yes }
+      - "inspector_order_date": ${ inspector_order_date.format() }
+      - "inspector_order_fix_by_date": ${ inspector_order_fix_by_date.format() }
+      - "repairs_completion_untimely": ${ inspector_order["repairs_completion_untimely"] } 
+      - "repairs_too_much_time_for_completion": ${ inspector_order["repairs_too_much_time_for_completion"] } 
+      - "too_much_time_for_completion_explanation": ${ too_much_time_for_completion_explanation } 
+      - "repairs_request_letter_yes": ${ repairs_request_letter_yes }
+      - "repairs_request_letter_date": ${ repairs_request_letter_date.format() }
+      - "landlord": ${ repairs_requested_delivered_to["landlord"] } 
+      - "manager": ${ repairs_requested_delivered_to["manager"] } 
+      - "rent_amount": ${ currency(rent_amount) }
+      - "day_rent_due": ${ day_of(day_rent_due) } 
+      - "rent_paid": ${ rent_paid }
+      - "next_rent_due_date": ${ next_rent_due_date.format() } 
+      - "rent_due": ${ rent_due }
+      - "rent_owed": ${ rent_owed } 
+      - "relief_order_repairs": ${ relief_order_repairs }
+      - "relief_self_complete_repairs": ${ relief_self_complete_repairs }
+      - "relief_administrator": ${ relief_administrator }
+      - "relief_rent_refund": ${ relief_rent_refund }
+      - "relief_rent_reduction": ${ relief_rent_reduction }
+      - "relief_fine": ${ relief_fine }
+      - "relief_attorney_fees": ${ relief_attorney_fees }
+      - "relief_other": ${ relief_other }
+      - "relief_other_explanation": ${ relief_other_explanation } #need to check/fix wrapping to line up w/the lines on the PDF
+      # It's a signature: test which file version this is; leave empty unless it's the final version)
+      - "Signature": ${ Signature if i == "final" else '' }
+      - "date_signed": ${ date_signed }
