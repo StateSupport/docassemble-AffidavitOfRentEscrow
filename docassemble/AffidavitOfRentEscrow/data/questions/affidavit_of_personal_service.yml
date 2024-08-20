@@ -10,9 +10,9 @@ metadata:
   description: |-
     Affidavit of personal service
   can_I_use_this_form: |
-    If you are a _____________, you can use this interview to ____________.
+    Use this interview to create an Affidavit of Personal Service template. Use this form if your estimated cost of repairs is more than $20,000. If the cost of repairs is below $20,000, the court clerk will serve the landlord at the address provided by you, the tenant. Service will be by first class mail.
   before_you_start: |
-    Before you get started, you need to...
+    You, the tenant, is responsible for arranging for personal service on the landlord(s). Service may be done by any one 18 years of age or older who is not a party to the case. The tenant can not serve the landlord. Service must be made at least 5 days but not more than 10 days before the date of the hearing. The person doing the service must complete an Affidavit of Personal Service. The tenant must file this affidavit with the court at least 3 days before the
   maturity: production
   estimated_completion_minutes: 60
   estimated_completion_delta: 30
